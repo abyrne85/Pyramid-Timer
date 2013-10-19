@@ -1,0 +1,170 @@
+<!DOCTYPE html> 
+<html> 
+    <head> 
+    <title>Pyramid-Timer</title> 
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+    <link rel="stylesheet" href="css/timeTo.css"/>
+
+    
+
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+
+<style>
+    .timeTo{
+        margin:auto;
+        padding:10px;
+    }
+    #clock{
+        width:188px;
+    }
+    .center-group{
+        margin:0px auto;
+        width:270px;
+    }
+    
+   
+</style>
+
+</head> 
+<body> 
+
+<div data-role="page">
+
+    <div data-role="header">
+        <h1>Pyramid Timer</h1>
+    </div><!-- /header -->
+
+    <div data-role="content">   
+        <div class="inputs">
+            <div data-role="rangeslider">
+                <label for="range-1a">Time Range</label>
+                <input name="range-1a" id="range-1a" min="1" max="10" value="1" type="range" />
+                <input name="range-1b" id="range-1b" min="1" max="5"  value="4" type="range" />
+            </div>
+            <input type="submit" value="Start" id="start-btn" />
+            <div class = "center-group">
+                <div data-role="controlgroup" data-type="horizontal">
+                    <a href="#" id="sound" data-role="button">Sound</a>
+                    <a href="#" id="reset" data-role="button">Reset</a>
+                    <a href="#" id="stop"  data-role="button">Stop</a>
+
+                </div>
+            </div>
+
+        </div>
+    </div><!-- /content -->
+
+    <div data-role="content">       
+        <div class="timer-view"></div>
+    </div><!-- /content -->
+
+</div><!-- /page -->
+
+<audio id="audiotag1" src="sounds/beep-1.mp3" preload="auto"></audio>
+
+
+
+<script src="js/jquery.timeTo.js"></script>
+<script>
+
+    $(function(){
+
+        var minValue, maxValue;
+        var counter=1;
+        var timerArray=[];
+       
+
+
+        $('#start-btn').on("click", function(){
+
+            //slider values
+            minValue = $('#range-1a').val();
+            maxValue = $('#range-1b').val();
+
+            //disable start btn when clicked
+            $('#start-btn').attr('disabled','disabled');
+
+            //put all values into array
+            //double them
+            //reverse them
+            for(var i=minValue;i<=maxValue;i++){
+                timerArray.push(parseInt(i));
+                timerArray.push(parseInt(i));
+            }
+            for(var i=maxValue-1;i>=minValue;i--){
+                timerArray.push(parseInt(i));
+                timerArray.push(parseInt(i));   
+            }
+            createTimer(timerArray);
+
+        });
+
+        
+        function createTimer(timerArray){
+
+            //create div to hold timer
+            var currentTimer = $('<div id="clock"></div>');
+            currentTimer.appendTo('.timer-view');
+            
+            //create timer
+            var clock = $('#clock').timeTo(secsToMins(timerArray[counter]), function(){
+                 
+                $('#clock').remove();
+                //end of list -> no more array items -> stop making timers
+                if(isNaN(timerArray[counter])){
+                    return;      
+                } 
+               
+
+                //call itself again with the next item in the array
+                createTimer(timerArray);
+                counter++;
+
+
+            }); 
+
+            //children = [('#clock div:first-child'),('#clock div:last-child'),('#clock span:first-child')];
+
+        }
+                
+       
+
+        $('#stop').on('click', function(){
+
+            //hide the clock
+            //NEED TO STOP CLOCK SOMEHOW
+            $('#clock').remove();
+
+
+            //re-enable start btn
+            //NOT WORKING
+            $('#start-btn').removeAttr('disabled');
+
+            //console.log('stop');
+
+        });
+
+        $('#reset').on('click', function(){
+            $('#clock').timeTo("reset");
+            $('#start-btn').removeAttr('disabled');
+
+        });
+
+        $('#sound').on('click', function(){
+            document.getElementById('audiotag1').play();
+        });
+
+        //convert timer value to minutes
+        function secsToMins(int){
+            return int*60;
+        }
+    });
+</script>
+
+</body>
+</html>
